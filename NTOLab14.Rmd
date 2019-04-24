@@ -4,27 +4,102 @@ author: "NTO"
 date: "4/23/2019"
 output: html_document
 ---
+****
+### Overall questions and Importance: 
+****
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+* "Do mothers' smoking habits affect the presence of premature births?" and "Do mothers' smoking habits affect the correlation between their babys' gestational age and birth weight?"
+
+* These questions are important because answering them will allow us to provide recommendations to mothers on whether or not smoking is hurtful for their newborn babies.  Most parents care deeply about the well-being of their babies, who contain fragile health, making this statistical study very relevant and important. 
+
+****
+### Team Section
+****
+
+```{r,echo = FALSE}
+
 ```
 
-## R Markdown
+* Findings and Recommendations:
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+* New Tools / Comparison with Lab 4: 
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+****
+### David's Section
+****
 
-```{r cars}
-summary(cars)
+Subquestion and Importance: 
+
+```{r,echo = FALSE}
+
 ```
 
-## Including Plots
+New Tools: 
 
-You can also embed plots, for example:
+Findings / Relation to Team Section: 
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+****
+### Ryan's Section
+****
+
+Subquestion and Importance: 
+
+```{r,echo = FALSE}
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+New Tools: 
+
+Findings / Relation to Team Section: 
+
+****
+### Ethan's Section
+****
+
+Subquestion and Importance: 
+
+```{r,echo = FALSE}
+
+```
+
+New Tools: 
+
+Findings / Relation to Team Section: 
+
+****
+### Arie's Section
+****
+
+Subquestion and Importance: 
+
+```{r,echo = FALSE}
+
+```
+
+New Tools: 
+
+Findings / Relation to Team Section: 
+
+****
+### Anderson's Section
+****
+
+Subquestion and Importance: 
+
+```{r,echo = FALSE}
+
+```
+
+New Tools: 
+
+Findings / Relation to Team Section: 
+
+****
+#### Who Did What
+****
+
+* David -
+* Arie - 
+* Anderson - 
+* Ethan - 
+* Ryan - 
