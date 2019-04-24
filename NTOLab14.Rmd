@@ -4,6 +4,19 @@ author: "NTO"
 date: "4/23/2019"
 output: html_document
 ---
+
+```{r,echo = FALSE}
+
+library(tidyverse)
+library(lubridate)
+library(stringr)
+library(modelr)
+
+babies <- read_csv("https://raw.githubusercontent.com/ervance1/Sp2018-Data-Science-repo/master/babies2a.dat")
+babies <- rename(babies, bwtoz = `bwt/oz`)
+
+```
+
 ****
 ### Overall questions and Importance: 
 ****
