@@ -130,7 +130,6 @@ ggplot(data = residdiff,aes(resid,color = smoke))+
 ```
 
 I used `add_residuals()` along with my model to plot the distribution of the redisuals in respect to the best linear model. The residial distributions are centered around zero which shows that the lines of best fit are accurate. The highest residual spike for mothers who still smoke as a higher residual. This makes sense if you consider the increased slope for the previous graph.
-Still smokes has more spread out residuals
 
 ****
 ### Ryan's Section
