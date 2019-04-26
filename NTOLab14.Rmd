@@ -161,35 +161,36 @@ I used `add_residuals()` along with my model to plot the distribution of the red
 
 Subquestion and Importance: Age and weight on gestation, given premature. we know that smoking causes premature babies, but what about the mother's age and weight, and how do they compare between smokers and non smokers?
 
-```{r,echo = FALSE}
+```{r,echo = FALSE,warning=FALSE}
 babies3 <- babies %>% filter(Premature == "1")
 #find correlation between premature babies and smoking
 
-ggplot((data = babies3), aes(x = mpregwt, y = gestation)) +
-  geom_point()
+#ggplot((data = babies3), aes(x = mpregwt, y = gestation)) +
+ # geom_point()
 #effect of pregnancy weight on gestation, given premature
-mod <- lm(mpregwt ~ gestation, data = babies3) #fits linear model
-coef(mod)
+mod1 <- lm(gestation ~ mpregwt, data = babies3) #fits linear model
+#coef(mod1)
 
 grid1 <- babies3 %>%
   data_grid(mpregwt,gestation)
 
 grid1 <- grid1 %>%
-  add_predictions(mod)
+  add_predictions(mod1)
 
 ggplot(data = babies3, aes(x = mpregwt)) +
   geom_point(aes(y = gestation)) +
   geom_line(aes(y = pred), data = grid1, colour = "red", size =1)
 
-babies3 <- babies3 %>%
+babies4 <- babies3 %>%
   add_residuals(mod1)
 #resids very far from 0 so very likely no correlation
-ggplot(data = babies3, aes(x =mpregwt , y =gestation)) +
-  geom_ref_line(h=0) +
+ggplot(data = babies4, aes(x =mpregwt , y =resid)) +
+  geom_ref_line(h=0)+
   geom_point()
 
-
-babies1 <-completeFun(babies, "time")
+```
+```{r,echo=FALSE,warning=FALSE}
+#babies1 <- completeFun(babies, "time")
 
 #time: 0 = never smoked, 1 = still smokes
 
@@ -197,9 +198,9 @@ babies1 <-completeFun(babies, "time")
 #new question: given child premature, how does mother's age influnce gestation for smokers and nonsmokers
  
 
-mod <- lm(mage ~ gestation, data = babies3)
-coef(mod) 
-?coef
+mod <- lm(gestation ~ mage, data = babies3)
+#coef(mod) 
+
 grid2 <- babies3 %>%
   data_grid(gestation, mage)
 
