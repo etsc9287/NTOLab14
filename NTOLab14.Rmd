@@ -224,15 +224,36 @@ Findings / Relation to Team Section: I found that a very weak minor positive cor
 ### Arie's Section
 ****
 
-Subquestion and Importance: 
+Subquestion and Importance:  How does smoking affect the pregnancy weight of moms? This question is  important and interesting because children are the most fragile when they are in the whom. It is crucial for Mom's to be cautious of what they do while carrying since it will have a direct affect to the unborn child.
 
 ```{r,echo = FALSE}
 
+babies1 <- babies%>%
+  filter(!is.na(mht), !is.na(mpregwt), !is.na(number), !is.na(mrace))%>%
+  select(marital, mht, mpregwt, gestation, `bwt/oz`, number, smoke)
+
+c<- cor(x = babies1$mpregwt , y= babies1$mht )
+c
+
+babies1_mod <- lm(mht ~mpregwt, data = babies1)
+coef(mod)
+
+Arie <- babies1%>%
+  data_grid(mht, mpregwt)
+
+Arie <- Arie%>%
+  add_predictions(babies1_mod)
+
+ggplot(data = babies1, mapping = aes(x = mpregwt))+geom_point(mapping = aes(y = mht))+facet_grid(~smoke)+
+  geom_line(mapping = aes(y = pred), data = Arie, color = "purple", size = .5)+
+  ylab("Mom's Average Height")+xlab("Mom's Average Pregnancy Weight")+ggtitle("Average Height and Weight of Mother's that Smoke vs. Non-Smokers", subtitle = "0 = Never Smokes, 1 = Smokes")
+
+
 ```
 
-New Tools: 
+New Tools: I used `lm()`, `data_grid()`, `add_predictions` to create my linear model ontop of the original data.
 
-Findings / Relation to Team Section: 
+Findings / Relation to Team Section: I found that there is a weak positive correlection of .4 between the mothers height and pregnancy weight. The data also shows that smoking has little to no effect on the mothers pregnancy weight.
 
 ****
 ### Anderson's Section
