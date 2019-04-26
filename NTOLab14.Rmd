@@ -33,9 +33,23 @@ babies <- rename(babies, bwtoz = `bwt/oz`)
 ```{r,echo = FALSE}
 mod2 <- lm(`bwt/oz` ~ gestation * smoke, data = davie)
 
-gridgrid <- davie %>% 
+gridtry <- davie %>% 
  data_grid(gestation,smoke) %>% 
   gather_predictions(mod2)
+
+co <- babies%>%na.omit()%>%
+  group_by(smoke)%>%
+  nest()
+
+smoke_mod <- function(df){
+  lm(`bwt/oz`~gestation,data = df)
+}
+
+co <- co%>%
+  mutate(mod = map(data, smoke_mod))
+
+co$mod[[1]]
+co$mod[[2]]
 
 ggplot(davie, aes(gestation,`bwt/oz`)) + 
   geom_point(alpha = 1/4, color = "blue") + facet_grid(~smoke)+
