@@ -150,15 +150,74 @@ Findings / Relation to Team Section:
 ### Ethan's Section
 ****
 
-Subquestion and Importance: 
-
+Subquestion and Importance: Does a mother's pregancy weight correlate with the baby's birth weight and is this correlation affected by smoking habits? This question is important because I can make suggestions to mothers on how to improve health of babies if a correlation exists between these variables.
 ```{r,echo = FALSE}
+
+babies <- babies %>%
+  na.omit() %>%
+  mutate(smokes = ifelse(smoke == "1", "Smokes", "Doesn't Smoke")) %>%
+  select(mpregwt, `bwt/oz`, smokes) 
+
+ggplot(data = babies, aes(x = mpregwt, y = `bwt/oz`)) +
+  geom_point() +
+  xlab("Pregnancy Weight") +
+  ylab("Birth Weight") +
+  ggtitle("Mother's Pregnancy Weight vs. Baby's Birth Weight")
+
+model1 <- lm(`bwt/oz` ~ mpregwt, data = babies)
+coef(model1)
+
+grid <- babies %>%
+  data_grid(mpregwt)
+
+stats <- babies %>%
+  add_residuals(model1) %>%
+  add_predictions(model1)
+
+#Predictions
+
+ggplot(data = babies, mapping = aes(x = mpregwt)) +
+  geom_point(mapping = aes(y = `bwt/oz`, color = smokes)) +
+  geom_line(mapping = aes(y = pred), data = stats, color = "green", size = 2) +
+  geom_smooth(mapping = aes(y = `bwt/oz`, color = smokes), method = "lm", se = FALSE, size = 2) + facet_wrap(~smokes) + 
+  xlab("Pregnancy Weight") +
+  ylab("Birth Weight") +
+  ggtitle("Mother's Pregnancy Weight vs. Baby's Birth Weight by Smoking Habit")
+  
+
+#Residuals
+
+ggplot(data = stats, mapping = aes(x = mpregwt, y = resid, color = smokes)) +
+  geom_smooth(method = "lm", size = 2, se = FALSE) +
+  geom_point() +
+  facet_wrap(~smokes) +
+  xlab("Pregnancy Weight") +
+  ylab("Residual") +
+  ggtitle("Residuals for Mother's Pregnancy Weight vs. Baby's Birth Weight")
+
+#Nesting
+
+by_smoking <- babies %>%
+  group_by(smokes) %>%
+  nest()
+
+smoke_model <- function(df){
+  lm(`bwt/oz` ~ mpregwt, data = df)
+}
+
+by_smoking <- by_smoking %>%
+  mutate(model = map(data, smoke_model)) %>%
+  mutate(pred = map(model, predict)) %>%
+  mutate(resid = map(model, residuals))
+
+by_smoking$model[[1]]
+by_smoking$model[[2]]
 
 ```
 
-New Tools: 
+New Tools: I used nesting to group by smoking habits and get list columns, models, predictions, and residuals for both habits.  I also used lm(), data_grid(), add_predictions(), and add_residuals() to make my basic models.
 
-Findings / Relation to Team Section: 
+Findings / Relation to Team Section: I found that a very weak minor positive correlation exists between pregnancy weight and the baby's weight with an R value of 0.17, and smoking habit appears to have little affect.  I created a scatter plot with just pregnancy weight vs. birth weight and then faceted by smoking habit, creating both an overall model (green line) and comapring it with the models for each facet. There was very little difference between the slope of the lines, though the intercept for women who don't smoke is quite a bit higher, implying we can predict a slightly higher baby's birth weight for those women than women who don't smoke at each pregnancy weight.  The residuals don't offer much as they are very scattered and show no significant patterns for both smoking habits, implying the weak correlation we knew existed.
 
 ****
 ### Arie's Section
