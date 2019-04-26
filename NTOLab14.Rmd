@@ -156,15 +156,15 @@ Subquestion and Importance: Does a mother's pregancy weight correlate with the b
 babies <- babies %>%
   na.omit() %>%
   mutate(smokes = ifelse(smoke == "1", "Smokes", "Doesn't Smoke")) %>%
-  select(mpregwt, `bwt/oz`, smokes) 
+  select(mpregwt, bwtoz, smokes) 
 
-ggplot(data = babies, aes(x = mpregwt, y = `bwt/oz`)) +
+ggplot(data = babies, aes(x = mpregwt, y = bwtoz)) +
   geom_point() +
   xlab("Pregnancy Weight") +
   ylab("Birth Weight") +
   ggtitle("Mother's Pregnancy Weight vs. Baby's Birth Weight")
 
-model1 <- lm(`bwt/oz` ~ mpregwt, data = babies)
+model1 <- lm(bwtoz ~ mpregwt, data = babies)
 coef(model1)
 
 grid <- babies %>%
@@ -173,13 +173,14 @@ grid <- babies %>%
 stats <- babies %>%
   add_residuals(model1) %>%
   add_predictions(model1)
-
+```
+```{r,echo=FALSE}
 #Predictions
 
 ggplot(data = babies, mapping = aes(x = mpregwt)) +
-  geom_point(mapping = aes(y = `bwt/oz`, color = smokes)) +
+  geom_point(mapping = aes(y = bwtoz, color = smokes)) +
   geom_line(mapping = aes(y = pred), data = stats, color = "green", size = 2) +
-  geom_smooth(mapping = aes(y = `bwt/oz`, color = smokes), method = "lm", se = FALSE, size = 2) + facet_wrap(~smokes) + 
+  geom_smooth(mapping = aes(y = bwtoz, color = smokes), method = "lm", se = FALSE, size = 2) + facet_wrap(~smokes) + 
   xlab("Pregnancy Weight") +
   ylab("Birth Weight") +
   ggtitle("Mother's Pregnancy Weight vs. Baby's Birth Weight by Smoking Habit")
@@ -202,7 +203,7 @@ by_smoking <- babies %>%
   nest()
 
 smoke_model <- function(df){
-  lm(`bwt/oz` ~ mpregwt, data = df)
+  lm(bwtoz ~ mpregwt, data = df)
 }
 
 by_smoking <- by_smoking %>%
