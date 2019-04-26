@@ -140,21 +140,81 @@ ggplot(data = residdiff,aes(resid,color = smoke))+
 ```
 
 I used `add_residuals()` along with my model to plot the distribution of the redisuals in respect to the best linear model. The residial distributions are centered around zero which shows that the lines of best fit are accurate. The highest residual spike for mothers who still smoke as a higher residual. This makes sense if you consider the increased slope for the previous graph.
-Still smokes has more spread out residuals
 
 ****
 ### Ryan's Section
 ****
 
-Subquestion and Importance: 
+Subquestion and Importance: Age and weight on gestation, given premature. we know that smoking causes premature babies, but what about the mother's age and weight, and how do they compare between smokers and non smokers?
 
 ```{r,echo = FALSE}
+babies3 <- babies %>% filter(Premature == "1")
+#find correlation between premature babies and smoking
 
+ggplot((data = babies3), aes(x = mpregwt, y = gestation)) +
+  geom_point()
+#effect of pregnancy weight on gestation, given premature
+mod <- lm(mpregwt ~ gestation, data = babies3) #fits linear model
+coef(mod)
+
+grid1 <- babies3 %>%
+  data_grid(mpregwt,gestation)
+
+grid1 <- grid1 %>%
+  add_predictions(mod)
+
+ggplot(data = babies3, aes(x = mpregwt)) +
+  geom_point(aes(y = gestation)) +
+  geom_line(aes(y = pred), data = grid1, colour = "red", size =1)
+
+babies3 <- babies3 %>%
+  add_residuals(mod1)
+#resids very far from 0 so very likely no correlation
+ggplot(data = babies3, aes(x =mpregwt , y =gestation)) +
+  geom_ref_line(h=0) +
+  geom_point()
+
+
+babies1 <-completeFun(babies, "time")
+
+#time: 0 = never smoked, 1 = still smokes
+
+
+#new question: given child premature, how does mother's age influnce gestation for smokers and nonsmokers
+ 
+
+mod <- lm(mage ~ gestation, data = babies3)
+coef(mod) 
+?coef
+grid2 <- babies3 %>%
+  data_grid(gestation, mage)
+
+grid2 <- grid2 %>%
+  add_predictions(mod)
+
+ggplot(data = babies3, aes(x =mage)) +
+  geom_jitter(aes(y = gestation)) +
+  geom_line(aes(y = pred), data = grid2, colour = "red", size =1)
+#slight negative correlation(no correlation) between age and premature, for smokers
+babies3 <- babies3 %>%
+  add_residuals(mod1)
+
+
+ggplot(data = babies3, aes(x = mage, y = resid)) +
+  geom_ref_line(h=0) +
+  geom_point()
+
+
+#time: 0 = never smoked, 1 = still smokes
+
+ggplot(data = babies3, aes(x = mage, y = gestation)) +
+  geom_jitter() +
+  facet_wrap( ~ time)
 ```
 
-New Tools: 
+New Tools: grid, add_residuals, add predictions, coef, lm
 
-Findings / Relation to Team Section: 
+Findings / Relation to Team Section: yeah so not much of a correlation for either age or mother's weight.
 
 ****
 ### Ethan's Section
@@ -163,31 +223,31 @@ Findings / Relation to Team Section:
 Subquestion and Importance: Does a mother's pregancy weight correlate with the baby's birth weight and is this correlation affected by smoking habits? This question is important because I can make suggestions to mothers on how to improve health of babies if a correlation exists between these variables.
 ```{r,echo = FALSE}
 
-babies <- babies %>%
+babiese <- babies %>%
   na.omit() %>%
   mutate(smokes = ifelse(smoke == "1", "Smokes", "Doesn't Smoke")) %>%
   select(mpregwt, bwtoz, smokes) 
 
-ggplot(data = babies, aes(x = mpregwt, y = bwtoz)) +
+ggplot(data = babiese, aes(x = mpregwt, y = bwtoz)) +
   geom_point() +
   xlab("Pregnancy Weight") +
   ylab("Birth Weight") +
   ggtitle("Mother's Pregnancy Weight vs. Baby's Birth Weight")
 
-model1 <- lm(bwtoz ~ mpregwt, data = babies)
+model1 <- lm(bwtoz ~ mpregwt, data = babiese)
 coef(model1)
 
-grid <- babies %>%
+grid <- babiese %>%
   data_grid(mpregwt)
 
-stats <- babies %>%
+stats <- babiese %>%
   add_residuals(model1) %>%
   add_predictions(model1)
 ```
 ```{r,echo=FALSE}
 #Predictions
 
-ggplot(data = babies, mapping = aes(x = mpregwt)) +
+ggplot(data = babiese, mapping = aes(x = mpregwt)) +
   geom_point(mapping = aes(y = bwtoz, color = smokes)) +
   geom_line(mapping = aes(y = pred), data = stats, color = "green", size = 2) +
   geom_smooth(mapping = aes(y = bwtoz, color = smokes), method = "lm", se = FALSE, size = 2) + facet_wrap(~smokes) + 
@@ -208,7 +268,7 @@ ggplot(data = stats, mapping = aes(x = mpregwt, y = resid, color = smokes)) +
 
 #Nesting
 
-by_smoking <- babies %>%
+by_smoking <- babiese %>%
   group_by(smokes) %>%
   nest()
 
@@ -228,7 +288,7 @@ by_smoking$model[[2]]
 
 New Tools: I used nesting to group by smoking habits and get list columns, models, predictions, and residuals for both habits.  I also used lm(), data_grid(), add_predictions(), and add_residuals() to make my basic models.
 
-Findings / Relation to Team Section: I found that a very weak minor positive correlation exists between pregnancy weight and the baby's weight with an R value of 0.17, and smoking habit appears to have little affect.  I created a scatter plot with just pregnancy weight vs. birth weight and then faceted by smoking habit, creating both an overall model (green line) and comapring it with the models for each facet. There was very little difference between the slope of the lines, though the intercept for women who don't smoke is quite a bit higher, implying we can predict a slightly higher baby's birth weight for those women than women who don't smoke at each pregnancy weight.  The residuals don't offer much as they are very scattered and show no significant patterns for both smoking habits, implying the weak correlation we knew existed.
+Findings / Relation to Team Section: I found that a very weak minor positive correlation exists between pregnancy weight and the baby's weight with an R value of 0.17, and smoking habit appears to have some affect.  I created a scatter plot with just pregnancy weight vs. birth weight and then faceted by smoking habit, creating both an overall model (green line) and comapring it with the models for each facet. There was very little difference between the slope of the lines, though the intercept for women who don't smoke is quite a bit higher, implying we can predict a slightly higher baby's birth weight for those women than women who don't smoke at a given pregnancy weight.  The residuals don't offer much as they are very scattered and show no significant patterns for both smoking habits, implying the weak correlation we knew existed.
 
 ****
 ### Arie's Section
@@ -240,10 +300,10 @@ Subquestion and Importance:  How does smoking affect the pregnancy weight of mom
 
 babies1 <- babies%>%
   filter(!is.na(mht), !is.na(mpregwt), !is.na(number), !is.na(mrace))%>%
-  select(marital, mht, mpregwt, gestation, `bwt/oz`, number, smoke)
+  select(marital, mht, mpregwt, gestation, bwtoz, number, smoke)
 
 c<- cor(x = babies1$mpregwt , y= babies1$mht )
-c
+
 
 babies1_mod <- lm(mht ~mpregwt, data = babies1)
 
