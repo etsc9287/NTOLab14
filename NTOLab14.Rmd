@@ -5,7 +5,7 @@ date: "4/23/2019"
 output: html_document
 ---
 
-```{r,echo = FALSE}
+```{r,echo = FALSE,include=FALSE}
 
 library(tidyverse)
 library(lubridate)
@@ -42,12 +42,13 @@ babies <- rename(babies, bwtoz = `bwt/oz`)
 ### David's Section
 ****
 
-Subquestion and Importance: 
+Subquestion and Importance: Is there a coorelation between gestation and birthweight? Are ther other underlying facors that effect this coorelation?
+
+This question is important to address because typically a premature babies are charachterized by a low gestation periods and premature babies usually weight less. If there are other factors that effect this coorelation, it can give us insight on what other variables have an effect on prematureness. 
 
 ```{r,echo = FALSE}
+
 dave1 <- babies %>% filter(!is.na(gestation))
-ggplot(dave1,aes(bwtoz,gestation))+
-  geom_point()
 
 model1 <- function(a,data){
   a[1]+data* a[2]
@@ -61,98 +62,75 @@ distance <- function(a,data){
     # data is in form data$column
     # finds distance
 }
-gest_dist <- function(a1,a2,data){
-  distance(c(a1,a2),dave1$gestation)
+
+bwt_dist <- function(a1,a2,data){
+  distance(c(a1,a2),dave1$bwtoz)
 }
-
-models <- tibble(
-  a1 = runif(2500, 200, 300),
-  a2 = runif(2500, -2, 2)
-)
-
-models2 <- models %>% mutate(dist = purrr::map2_dbl(a1,a2,gest_dist))
-models
-models2
 ```
-```{r}
-#grid searchinig instead of random
-grid <- expand.grid(
-  a1 = seq(200,300, length =25),
-  a2 = seq(-1,1,length = 25)
-) %>% mutate(dist = purrr::map2_dbl(a1,a2,gest_dist))
-grid
-grid %>% ggplot(aes(a1,a2))+
-  geom_point(data = filter(grid, rank(dist)<=10),color = "red",size = 4)+ 
-  geom_point(aes(color = -dist))
 
-ggplot(dave1,aes(bwtoz,gestation))+
-  geom_point()+
-  geom_abline(
-    aes(intercept = a1, slope = a2, color = -dist),
-    data = filter(grid, rank(dist) <= 10)
-  )
-doop <- dave1[,c(3:4)]
+```{r,echo= FALSE}
+doop <- dave1[,c(4,3)]
 #best <- optim(c(0,0),distance, data = doop)
 #best$par
 ## intial starting point in the c(0,0). finds the best slope to the data 
 
-```
-```{r}
-mod3 <- lm(gestation~bwtoz, data = doop)
+mod3 <- lm(bwtoz ~ gestation, data = doop)
 a <- coef(mod3)
 a
-```
 
-
-```{r}
-ggplot(data = dave1, aes(bwtoz,gestation))+
+ggplot(data = dave1, aes(gestation,bwtoz))+
   geom_point(color = "grey15")+
-  geom_abline(aes(intercept = a[1], slope = a[2]),color = "blue",size = 1.2)
+ geom_abline(aes(intercept = a[1], slope = a[2]),color = "blue",size = 1.2)+ ggtitle("Birth Weight Vs. Gestation period") + ylab("Birth Weight(oz)")
 
-grid <- doop %>% data_grid(bwtoz)
-grid
-grid <- grid %>% add_predictions(mod3)
-grid
-ggplot(doop, aes(bwtoz)) +
-  geom_point(aes(y=gestation))+
-  geom_line( aes( y = pred),data = grid)
+#grid <- doop %>% data_grid(bwtoz)
+
+#grid <- grid %>% add_predictions(mod3)
+
+#ggplot(doop, aes(bwtoz)) +
+ # geom_point(aes(y=gestation))+
+  #geom_line( aes( y = pred),data = grid)
 
 ```
-```{r}
-dope <- doop %>% add_residuals(mod3)
-dope
-ggplot(data = dope,aes(resid))+
-  geom_freqpoly(binwidth = 1)
+
+I used `lm()` to find the coeffients for the line a best fit using the model ` a[1]+data* a[2]`. The intercept and slope are shown in the tibble above. The graph shows a positive trend between gestation and birthweight. The lower the gestation period the lower the birthweight.
+
+```{r,echo=FALSE,include=FALSE}
+#dope <- doop %>% add_residuals(mod3)
+
+#ggplot(data = dope,aes(resid))+
+#  geom_freqpoly(binwidth = 1)
 
 davie <- dave1[,c(3,4,18)] %>% filter(!is.na(smoke)) %>% mutate(smoke = str_replace_all(smoke, c("1" = "still smokes", "0" = "never")))
-ggplot(davie,aes(bwtoz,gestation))+
+ggplot(davie,aes(gestation,bwtoz))+
   geom_point(aes(color = smoke))
 ```
-```{r}
-mod2 <- lm(gestation ~ bwtoz * smoke, data = davie)
+****
+How does a mother's smoking habits influence this coorelation??
 
-bb <- coef(mod2)
-bb
+```{r,echo=FALSE}
+mod2 <- lm(bwtoz ~ gestation * smoke, data = davie)
+
 gridtry <- davie %>% 
-  data_grid(bwtoz,smoke) %>% 
+ data_grid(gestation,smoke) %>% 
   gather_predictions(mod2)
-gridtry
 
-ggplot(davie, aes(bwtoz,gestation,colour = smoke)) + 
+ggplot(davie, aes(gestation,bwtoz,colour = smoke)) + 
   geom_point() + 
-  geom_line(data = gridtry, aes(y = pred))
+  geom_line(data = gridtry, aes(y = pred),size = 1)+ggtitle("Colored by smoke habits")
+```
 
+I used the model `y ~ x1*x2` or `bwtoz ~ gestation * smoke` to see if the smoking habits along with gestation influence birthweight. I used `gather_predictions()` to plot the lines of best fit for each smoking habit. Smoking habit does have an effect on the coorelation between birthweight and gestation. The line of best fit for mothers who still smoke is significally steeper. This means that mothers who smoke have more likelyhood of a premature baby. Also of premature babies, babies with mothers that smoke weight less.
+
+```{r,echo=FALSE}
 residdiff <- davie %>% add_residuals(mod2)
-residdiff
 
 ggplot(data = residdiff,aes(resid,color = smoke))+
-  geom_freqpoly(binwidth = 1)
+  geom_freqpoly(binwidth = 2,size = 1)+ xlab("Residual") + ggtitle("Residual distribution in respect to best linear model")
 
 ```
 
-New Tools: 
-
-Findings / Relation to Team Section: 
+I used `add_residuals()` along with my model to plot the distribution of the redisuals in respect to the best linear model. The residial distributions are centered around zero which shows that the lines of best fit are accurate. The highest residual spike for mothers who still smoke as a higher residual. This makes sense if you consider the increased slope for the previous graph.
+Still smokes has more spread out residuals
 
 ****
 ### Ryan's Section
