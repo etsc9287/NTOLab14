@@ -233,7 +233,7 @@ ggplot(data = babies3, aes(x = mage, y = gestation)) +
 
 New Tools: grid, add_residuals, add predictions, coef, lm
 
-Findings / Relation to Team Section: yeah so not much of a correlation for either age or mother's weight.
+Findings / Relation to Team Section:  slight positive correlation between mother's age and length of gestation. Stronger negative correlation between mother's pregnancy weight and length of gestation. Can't really say age of mother has any effect on the length of gestation, but it's possible mother's weight has a connection with length of gestation. Correlation is not causation, so we can't imply a lower weight leads to a longer length of gestation.
 
 ****
 ### Ethan's Section
