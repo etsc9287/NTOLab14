@@ -60,7 +60,7 @@ ggplot(davie, aes(gestation,`bwt/oz`)) +
 
 * Findings and Recommendations: From our subquestions we found that mother's smoking habits do affect the presence of premature births. When comparing gestation and birth weight, babies are predicted to have a smaller birth weight when the mother smokes during pregnancy compared to mother's that never smoke. We recommend not smoking during pregnancy to prevent lower birth weights, and births.
 
-* New Tools / Comparison with Lab 4: 
+* New Tools / Comparison with Lab 4: For our team section, we faceted by smokers and non smokers to plot gestation against birthweight, and made linear prediction models on each facet. We used modelling techniques like data_grid and gather_predictions on this lab to achieve this unlike Lab 4, and got the intercepts and slope for each prediction model by grouping by smoking habits and nesting.
 
 ****
 ### David's Section
