@@ -31,7 +31,11 @@ babies <- rename(babies, bwtoz = `bwt/oz`)
 ****
 
 ```{r,echo = FALSE}
-mod2 <- lm(`bwt/oz` ~ gestation * smoke, data = davie)
+
+dave1 <- babies %>% filter(!is.na(gestation))
+davie <- dave1[,c(3,4,18)] %>% filter(!is.na(smoke)) %>% mutate(smoke = str_replace_all(smoke, c("1" = "still smokes", "0" = "never")))
+
+mod2 <- lm(bwtoz ~ gestation * smoke, data = davie)
 
 gridtry <- davie %>% 
  data_grid(gestation,smoke) %>% 
@@ -42,7 +46,7 @@ co <- babies%>%na.omit()%>%
   nest()
 
 smoke_mod <- function(df){
-  lm(`bwt/oz`~gestation,data = df)
+  lm(bwtoz~gestation,data = df)
 }
 
 co <- co%>%
@@ -51,7 +55,7 @@ co <- co%>%
 co$mod[[1]]
 co$mod[[2]]
 
-ggplot(davie, aes(gestation,`bwt/oz`)) + 
+ggplot(davie, aes(gestation,bwtoz)) + 
   geom_point(alpha = 1/4, color = "blue") + facet_grid(~smoke)+
   geom_line(data = gridtry, aes(y = pred),size = 1)+ggtitle("Gestation and Birth Weight of Smokers vs Non-Smokers")+ylab("bwtoz")
 
