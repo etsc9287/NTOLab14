@@ -360,5 +360,5 @@ Findings / Relation to Team Section:
 * David -
 * Arie - 
 * Anderson - 
-* Ethan - 
+* Ethan - Ind section, Team section: new tools, questions/importance, nesting
 * Ryan - 
