@@ -347,15 +347,57 @@ Findings / Relation to Team Section: I found that there is a weak positive corre
 ### Anderson's Section
 ****
 
-Subquestion and Importance: 
+Subquestion and Importance: How does smoking affect the weights of both pregnant moms and babies birth weight. This question is intriguing and important because smoking lead to more problems in the future. The data will be key to spreading information on how smoking can affect the weights of both mother and infant. 
 
 ```{r,echo = FALSE}
+ggplot(data = babies, aes(mpregwt, bwtoz)) +
+  geom_point()
+
+model1 <- lm(bwtoz ~ mpregwt, data = babies)
+
+coef(model1)
+grid <- babies %>%
+  data_grid(mpregwt)
+measure_distance <- function(mod, data) {
+  diff <- data - model1(mod, data)
+  sqrt(mean(diff ^ 2))
+}
+
+bwtoz_dist <- function(a1,a2){
+  measure_distance(c(a1,a2),babies$bwtoz)
+}
+measure_distance(c(7,2), babies$bwtoz)
+
+eh <- tibble(
+  a1 = runif(250, -20, 40),
+  a2 = runif(250, -5, 5)
+)
+eh <- eh %>%
+  mutate(dist = purrr::map2_dbl(a1,a2,measure_distance(c(a1,a2), babies$bwtoz)))
+eh
+grid <- grid %>%
+  add_predictions(model1)
+view(grid)
+
+```
+```{r, echo=FALSE, warning=FALSE}
+model2 <- lm(mpregwt ~ bwtoz, data = babies)
+op <- coef(model2) 
+meh <- babies %>%
+  mutate(smoke = str_replace_all(smoke, c("1" = "still smokes", "0" = "never"))) %>%
+  filter(!is.na(smoke))
+ggplot(data = meh, aes(bwtoz, mpregwt)) +
+  geom_point(aes(color = smoke)) +
+  geom_abline(aes(intercept = op[1], slope = op[2]), color = "green") +
+  ggtitle('Mothers pregnancy weight vs Birth weight') +
+  ylab("Mothers pregnant weight") +
+  xlab("Birth Weight") 
 
 ```
 
-New Tools: 
+New Tools: In this lab I used various functions such as 'measure_distance()', 'lm()' and 'add_predictions()'.
 
-Findings / Relation to Team Section: 
+Findings / Relation to Team Section: In my finding I have found there's a weak correlation between smoking and the weights of the pregnant moms and the babies when they are born. The data helps contribute to the team section with visual representations of smoke and other factors.
 
 ****
 #### Who Did What
