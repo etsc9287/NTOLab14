@@ -135,15 +135,76 @@ I used `add_residuals()` along with my model to plot the distribution of the red
 ### Ryan's Section
 ****
 
-Subquestion and Importance: 
+Subquestion and Importance: Age and weight on gestation, given premature. we know that smoking causes premature babies, but what about the mother's age and weight, and how do they compare between smokers and non smokers?
 
 ```{r,echo = FALSE}
+babies3 <- babies %>% filter(Premature == "1")
+#find correlation between premature babies and smoking
 
+ggplot((data = babies3), aes(x = mpregwt, y = gestation)) +
+  geom_point()
+#effect of pregnancy weight on gestation, given premature
+mod <- lm(mpregwt ~ gestation, data = babies3) #fits linear model
+coef(mod)
+
+grid1 <- babies3 %>%
+  data_grid(mpregwt,gestation)
+
+grid1 <- grid1 %>%
+  add_predictions(mod)
+
+ggplot(data = babies3, aes(x = mpregwt)) +
+  geom_point(aes(y = gestation)) +
+  geom_line(aes(y = pred), data = grid1, colour = "red", size =1)
+
+babies3 <- babies3 %>%
+  add_residuals(mod1)
+#resids very far from 0 so very likely no correlation
+ggplot(data = babies3, aes(x =mpregwt , y =gestation)) +
+  geom_ref_line(h=0) +
+  geom_point()
+
+
+babies1 <-completeFun(babies, "time")
+
+#time: 0 = never smoked, 1 = still smokes
+
+
+#new question: given child premature, how does mother's age influnce gestation for smokers and nonsmokers
+ 
+
+mod <- lm(mage ~ gestation, data = babies3)
+coef(mod) 
+?coef
+grid2 <- babies3 %>%
+  data_grid(gestation, mage)
+
+grid2 <- grid2 %>%
+  add_predictions(mod)
+
+ggplot(data = babies3, aes(x =mage)) +
+  geom_jitter(aes(y = gestation)) +
+  geom_line(aes(y = pred), data = grid2, colour = "red", size =1)
+#slight negative correlation(no correlation) between age and premature, for smokers
+babies3 <- babies3 %>%
+  add_residuals(mod1)
+
+
+ggplot(data = babies3, aes(x = mage, y = resid)) +
+  geom_ref_line(h=0) +
+  geom_point()
+
+
+#time: 0 = never smoked, 1 = still smokes
+
+ggplot(data = babies3, aes(x = mage, y = gestation)) +
+  geom_jitter() +
+  facet_wrap( ~ time)
 ```
 
-New Tools: 
+New Tools: grid, add_residuals, add predictions, coef, lm
 
-Findings / Relation to Team Section: 
+Findings / Relation to Team Section: yeah so not much of a correlation for either age or mother's weight.
 
 ****
 ### Ethan's Section
