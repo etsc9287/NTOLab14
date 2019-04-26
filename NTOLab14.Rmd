@@ -153,31 +153,31 @@ Findings / Relation to Team Section:
 Subquestion and Importance: Does a mother's pregancy weight correlate with the baby's birth weight and is this correlation affected by smoking habits? This question is important because I can make suggestions to mothers on how to improve health of babies if a correlation exists between these variables.
 ```{r,echo = FALSE}
 
-babies <- babies %>%
+babiese <- babies %>%
   na.omit() %>%
   mutate(smokes = ifelse(smoke == "1", "Smokes", "Doesn't Smoke")) %>%
   select(mpregwt, bwtoz, smokes) 
 
-ggplot(data = babies, aes(x = mpregwt, y = bwtoz)) +
+ggplot(data = babiese, aes(x = mpregwt, y = bwtoz)) +
   geom_point() +
   xlab("Pregnancy Weight") +
   ylab("Birth Weight") +
   ggtitle("Mother's Pregnancy Weight vs. Baby's Birth Weight")
 
-model1 <- lm(bwtoz ~ mpregwt, data = babies)
+model1 <- lm(bwtoz ~ mpregwt, data = babiese)
 coef(model1)
 
-grid <- babies %>%
+grid <- babiese %>%
   data_grid(mpregwt)
 
-stats <- babies %>%
+stats <- babiese %>%
   add_residuals(model1) %>%
   add_predictions(model1)
 ```
 ```{r,echo=FALSE}
 #Predictions
 
-ggplot(data = babies, mapping = aes(x = mpregwt)) +
+ggplot(data = babiese, mapping = aes(x = mpregwt)) +
   geom_point(mapping = aes(y = bwtoz, color = smokes)) +
   geom_line(mapping = aes(y = pred), data = stats, color = "green", size = 2) +
   geom_smooth(mapping = aes(y = bwtoz, color = smokes), method = "lm", se = FALSE, size = 2) + facet_wrap(~smokes) + 
@@ -198,7 +198,7 @@ ggplot(data = stats, mapping = aes(x = mpregwt, y = resid, color = smokes)) +
 
 #Nesting
 
-by_smoking <- babies %>%
+by_smoking <- babiese %>%
   group_by(smokes) %>%
   nest()
 
@@ -230,13 +230,13 @@ Subquestion and Importance:  How does smoking affect the pregnancy weight of mom
 
 babies1 <- babies%>%
   filter(!is.na(mht), !is.na(mpregwt), !is.na(number), !is.na(mrace))%>%
-  select(marital, mht, mpregwt, gestation, `bwt/oz`, number, smoke)
+  select(marital, mht, mpregwt, gestation, bwtoz, number, smoke)
 
 c<- cor(x = babies1$mpregwt , y= babies1$mht )
-c
+
 
 babies1_mod <- lm(mht ~mpregwt, data = babies1)
-coef(mod)
+coef(babies1_mod)
 
 Arie <- babies1%>%
   data_grid(mht, mpregwt)
