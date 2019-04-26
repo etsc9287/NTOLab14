@@ -31,10 +31,20 @@ babies <- rename(babies, bwtoz = `bwt/oz`)
 ****
 
 ```{r,echo = FALSE}
+mod2 <- lm(`bwt/oz` ~ gestation * smoke, data = davie)
+
+gridgrid <- davie %>% 
+ data_grid(gestation,smoke) %>% 
+  gather_predictions(mod2)
+
+ggplot(davie, aes(gestation,`bwt/oz`)) + 
+  geom_point(alpha = 1/4, color = "blue") + facet_grid(~smoke)+
+  geom_line(data = gridtry, aes(y = pred),size = 1)+ggtitle("Gestation and Birth Weight of Smokers vs Non-Smokers")+ylab("bwtoz")
 
 ```
 
-* Findings and Recommendations:
+
+* Findings and Recommendations: From our subquestions we found that mother's smoking habits do affect the presence of premature births. When comparing gestation and birth weight, babies are predicted to have a smaller birth weight when the mother smokes during pregnancy compared to mother's that never smoke. We recommend not smoking during pregnancy to prevent lower birth weights, and births.
 
 * New Tools / Comparison with Lab 4: 
 
@@ -297,7 +307,6 @@ c<- cor(x = babies1$mpregwt , y= babies1$mht )
 
 
 babies1_mod <- lm(mht ~mpregwt, data = babies1)
-coef(babies1_mod)
 
 Arie <- babies1%>%
   data_grid(mht, mpregwt)
